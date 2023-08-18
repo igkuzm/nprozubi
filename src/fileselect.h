@@ -2,18 +2,22 @@
  * File              : fileselect.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 28.07.2023
+ * Last Modified Date: 18.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef FILE_SELECT_H
 #define FILE_SELECT_H
 
 #include "../prozubilib/prozubilib.h"
+#include <string.h>
 #include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <newt.h>
 #include <dirent.h>
+#include "helpers.h"
+
+static char * staticpath = NULL;
 
 char *getcwd(char *buffer, int maxlen);
 
@@ -24,14 +28,45 @@ static const char * fext(const char *filename) {
 		return dot + 1;
 }
 
+static int lastpath(const char *filename) {
+		const char *slash = strrchr(filename, '/');
+		if (!slash || slash == filename)
+			return 0;
+		return slash - filename;
+}
+
+static bool is_dir(const char *path, const struct dirent *d){
+	if (d->d_type == DT_DIR)
+		return true;
+	char filepath[BUFSIZ];
+	snprintf(filepath, BUFSIZ-1, "%s/%s", path, d->d_name);
+	DIR *dir;
+	if ((dir = opendir(filepath))){
+		closedir(dir);
+		return true;
+	}
+	return false;
+}
+
+static int file_compar(const struct dirent **a, const struct dirent **b){
+	// check if dir
+	if (is_dir(staticpath, *a) && !is_dir(staticpath, *b))
+		return -1;
+	if (!is_dir(staticpath, *a) && is_dir(staticpath, *b))
+		return 1;
+		
+	return strcoll((*a)->d_name, (*b)->d_name);
+}
+
 static int 
 file_select_filter(const struct dirent *d){
 	// no names start with dot
 	if (d->d_name[0] == '.'){
-		if (d->d_name[1] == '.')
-			return 1;
-		else
-			return 0;
+		if (d->d_name[1] == '.'){
+			if (strcmp(staticpath, "/"))
+				return 1;
+		}
+		return 0;
 	}
 	if (d->d_type == DT_REG){
 		// allow only *.png, *.tiff, *jpeg
@@ -71,6 +106,7 @@ static int
 file_select_refresh(
 		prozubi_t *p, 
 		char **path,
+		int selected,
 		int cols, int rows)
 {
 	int i, key, ret=0;
@@ -92,22 +128,32 @@ file_select_refresh(
 	newtListboxSetWidth(list, cols);
 	newtComponentAddDestroyCallback(list, file_select_on_destroy, NULL);
 
-	struct dirent **files;
-	int count = scandir (*path, &(files), 
-			file_select_filter, alphasort);
+	// set static path
+	staticpath = *path;
+
+	struct dirent **dirents;
+	int count = scandir (*path, &(dirents), 
+			file_select_filter, file_compar);
+	int dl = 0, fl = 0;
 	for (i = 0; i < count; ++i) {
-		struct dirent *d = files[i];
+		struct dirent *d = dirents[i];
 		char name[256];
 		if (d->d_type == DT_DIR)
 			sprintf(name, "[%s]", d->d_name);
 		else if (d->d_type == DT_REG)
 			sprintf(name, "*%s", d->d_name);
 		else if (d->d_type == DT_LNK)
-			sprintf(name, "~%s", d->d_name);
+			if (is_dir(*path, d))
+				sprintf(name, "~[%s]", d->d_name);
+			else
+				sprintf(name, "~%s", d->d_name);
 		else 
 			sprintf(name, "%s", d->d_name);
 		newtListboxAppendEntry(list, name, d);
 	}
+
+	// select
+	newtListboxSetCurrent(list, selected);
 	
 	newtFormRun(form, &toexit);
 	key  = -1;
@@ -132,8 +178,21 @@ file_select_refresh(
 			if (d->d_type == DT_REG){
 				ret = 1;
 			}
-			strcat(*path, "/");
-			strcat(*path, d->d_name);
+			if (strcmp(d->d_name, "..") == 0){
+				// remove last path component
+				int i = lastpath(*path);
+				if (i==0) i = 1;
+				path[0][i] = 0;
+				ret = 0;
+			} else {
+				if (is_dir(*path, d)){
+					strcat(*path, "/");
+					strcat(*path, d->d_name);
+					ret = 0;
+				} else {
+					ret = newtListboxGetByKey(list, d);
+				}
+			}
 		}
 	}
 
@@ -165,7 +224,7 @@ file_select_new(
 	newtCenteredWindow(cols, rows, filepath);
 
 	int ret; 
-	while ((ret=file_select_refresh(p, &filepath, cols, rows)) == 0){
+	while ((ret=file_select_refresh(p, &filepath, ret, cols, rows)) != -1){
 		// do redraw
 		newtPopWindow();
 		newtCenteredWindow(cols, rows, filepath);
