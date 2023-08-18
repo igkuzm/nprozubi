@@ -2,7 +2,7 @@
  * File              : main.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 20.07.2023
- * Last Modified Date: 30.07.2023
+ * Last Modified Date: 18.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
@@ -82,6 +82,15 @@ on_destroy(
 
 int main(int argc, char *argv[])
 {
+	// try to load token
+	char token[256] = {0};
+	FILE *fp = fopen("token", "r");
+	if (fp) {
+		fread(token, 255, 1, fp);
+		fclose(fp);
+		token[255] = 0;
+	}
+
 	SWITCH selected = SW_PATIENTS;
 	int i, cols, rows, key, appclose = 0;
 	newtComponent form, list=NULL, switcher, ans=NULL;
@@ -93,7 +102,7 @@ int main(int argc, char *argv[])
 
 	prozubi_t *p =
 			prozubi_init(
-					"prozubi.sqlite", "", 
+					"prozubi.sqlite", token, 
 					//NULL, error_callback, 
 					NULL, error_callback, 
 					NULL, log_callback);
