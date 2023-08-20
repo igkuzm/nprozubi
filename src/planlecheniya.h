@@ -2,7 +2,7 @@
  * File              : planlecheniya.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 24.07.2023
- * Last Modified Date: 31.07.2023
+ * Last Modified Date: 21.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
@@ -296,11 +296,11 @@ plan_lecheniya_update(
 
 			int sel = -1;
 			while (sel != 0 && sel != 1){
-				const char *buttons[] = {"отмена", "печать", "просмотр"};
+				const char *buttons[] = {"отмена", "печать", "просмотр", "email"};
 				sel = dialog(
 						"Печать плана", 
 						"Распечатать план лечения или открыть для просмотра?", 
-						buttons, 3);
+						buttons, 4);
 				if (sel == 1){
 					newtSuspend();
 					system("unoconv -f pdf out.rtf");
@@ -310,6 +310,11 @@ plan_lecheniya_update(
 					newtSuspend();
 					system("unoconv -f pdf out.rtf");
 					system("fbpdf out.pdf");
+					newtResume();
+				} else if (sel == 3){
+					newtSuspend();
+					system("unoconv -f pdf out.rtf");
+					system("mutt -a out.pdf");
 					newtResume();
 				}
 			}

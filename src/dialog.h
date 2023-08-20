@@ -2,7 +2,7 @@
  * File              : dialog.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 29.07.2023
+ * Last Modified Date: 21.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef DIALOG_H
@@ -22,7 +22,7 @@ dialog(
 		const char *buttons[], int count)
 {
 	int ret = -1;
-	int i, key, x=0, y=0, cols=0, max=0, rows = 6;
+	int i, key, x=0, y=0, cols=0, rows = 6, alen[count];
 	struct newtExitStruct toexit;
 
 	// count cols
@@ -33,13 +33,14 @@ dialog(
 		mbstate_t ps;
 		while(*p){
 			int ret = mbrtowc(&c, p, MB_CUR_MAX, &ps);
-			len += wcwidth(c);
+			//len += wcwidth(c);
+			len ++;
 			p += ret;
 		}
-		if (len > max)
-			max = len;
+		alen[i] = len;
+		cols += len;
 	}
-	cols = max * count + 2 + count;
+	cols += 3 * count;
 
 	newtComponent form, text;
 	newtComponent array[count];
@@ -58,7 +59,7 @@ dialog(
 		newtComponent b = newtCompactButton(x, rows-1, buttons[i]);
 		array[i] = b;
 		newtFormAddComponent(form, b);
-		x += max + 1;
+		x += alen[i] + 3;
 	}
 
 	newtFormRun(form, &toexit);
