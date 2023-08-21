@@ -2,7 +2,7 @@
  * File              : caseslist.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 30.07.2023
+ * Last Modified Date: 21.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef CASES_LIST_H
@@ -20,6 +20,7 @@
 #include "combobox.h"
 #include "planlecheniya.h"
 #include "imageslist.h"
+#include "textview.h"
 
 
 struct cases_list_t {
@@ -180,43 +181,53 @@ cases_list_new(
 			switch (n->type) {
 				case CASES_LIST_TYPE_TEXT:
 					{
+						int edit = 0;
 						int cur = newtListboxGetByKey(list, n);
-						newtSuspend();
-						remove(".tmp.txt");
-
-						FILE *fp = fopen(".tmp.txt", "w+");
-						if (!fp) 
-							break;
-						
 						char *v = (char *)prozubi_case_get(n->c, n->key);
-						if (n->key == CASEDIAGNOZIS)
-							if (!v || strlen(v) < 2)
-								v = prozubi_diagnosis_get(p, n->c);
-						if (v)
-							fwrite(v, strlen(v), 1, fp);
-						fclose(fp);
-						
-						system("$EDITOR .tmp.txt");
-						
-						fp = fopen(".tmp.txt", "r");
-						if (!fp) 
-							break;
-						fseek(fp, 0, SEEK_END);
-						size_t size = ftell(fp);
-						fseek(fp, 0, SEEK_SET);
-						char *buf = (char *)malloc(size);
-						if (!buf) break;
-						fread(buf, size, 1, fp);
-						fclose(fp);
-						
-						prozubi_case_set_text(n->key, p, n->c, buf);
+						if (key == 'e' || (edit = textview(n->title, v))){
+							if (edit == -1){
+								//remove
+								prozubi_case_set_text(n->key, p, n->c, "");
+								cases_list_update(list, &t);
+								newtListboxSetCurrent(list, cur);
+								break;
+							}
+							newtSuspend();
+							remove(".tmp.txt");
 
-						free(buf);
-						
-						newtResume();
+							FILE *fp = fopen(".tmp.txt", "w+");
+							if (!fp) 
+								break;
+							
+							if (n->key == CASEDIAGNOZIS)
+								if (!v || strlen(v) < 2)
+									v = prozubi_diagnosis_get(p, n->c);
+							if (v)
+								fwrite(v, strlen(v), 1, fp);
+							fclose(fp);
+							
+							system("$EDITOR .tmp.txt");
+							
+							fp = fopen(".tmp.txt", "r");
+							if (!fp) 
+								break;
+							fseek(fp, 0, SEEK_END);
+							size_t size = ftell(fp);
+							fseek(fp, 0, SEEK_SET);
+							char *buf = (char *)malloc(size);
+							if (!buf) break;
+							fread(buf, size, 1, fp);
+							fclose(fp);
+							
+							prozubi_case_set_text(n->key, p, n->c, buf);
 
-						cases_list_update(list, &t);
-						newtListboxSetCurrent(list, cur);
+							free(buf);
+							
+							newtResume();
+
+							cases_list_update(list, &t);
+							newtListboxSetCurrent(list, cur);
+						}
 						break;
 					}
 				case CASES_LIST_TYPE_ZFORMULA:
