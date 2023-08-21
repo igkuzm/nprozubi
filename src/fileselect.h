@@ -2,7 +2,7 @@
  * File              : fileselect.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 18.08.2023
+ * Last Modified Date: 21.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef FILE_SELECT_H
@@ -68,7 +68,7 @@ file_select_filter(const struct dirent *d){
 		}
 		return 0;
 	}
-	if (d->d_type == DT_REG){
+	if (d->d_type == DT_REG || d->d_type == DT_LNK){
 		// allow only *.png, *.tiff, *jpeg
 		const char *ext = fext(d->d_name);
 		if (strcmp(ext, "png") == 0) return 1;
@@ -176,21 +176,25 @@ file_select_refresh(
 			(struct dirent *)newtListboxGetCurrent(list);
 		if(d){
 			if (d->d_type == DT_REG){
-				ret = 1;
-			}
-			if (strcmp(d->d_name, "..") == 0){
-				// remove last path component
-				int i = lastpath(*path);
-				if (i==0) i = 1;
-				path[0][i] = 0;
-				ret = 0;
+				// exit with filepath
+				strcat(*path, "/");
+				strcat(*path, d->d_name);
+				ret = -2;
 			} else {
-				if (is_dir(*path, d)){
-					strcat(*path, "/");
-					strcat(*path, d->d_name);
+				if (strcmp(d->d_name, "..") == 0){
+					// remove last path component
+					int i = lastpath(*path);
+					if (i==0) i = 1;
+					path[0][i] = 0;
 					ret = 0;
 				} else {
-					ret = newtListboxGetByKey(list, d);
+					if (is_dir(*path, d)){
+						strcat(*path, "/");
+						strcat(*path, d->d_name);
+						ret = 0;
+					} else {
+						ret = newtListboxGetByKey(list, d);
+					}
 				}
 			}
 		}
@@ -224,14 +228,14 @@ file_select_new(
 	newtCenteredWindow(cols, rows, filepath);
 
 	int ret; 
-	while ((ret=file_select_refresh(p, &filepath, ret, cols, rows)) != -1){
+	while ((ret=file_select_refresh(p, &filepath, ret, cols, rows)) >= 0){
 		// do redraw
 		newtPopWindow();
 		newtCenteredWindow(cols, rows, filepath);
 	}
 		
 	newtPopWindow();
-	if (ret == 1){
+	if (ret == -2){
 		// add file to images
 		return filepath; 
 	}

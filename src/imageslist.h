@@ -2,7 +2,7 @@
  * File              : imageslist.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 29.07.2023
+ * Last Modified Date: 21.08.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef IMAGES_LIST_H
@@ -140,10 +140,8 @@ images_list_new(
 						prozubi_image_new(p, time(NULL), 
 								"снимок", c->id, NULL, 0, NULL);
 				if (img){
-					if (prozubi_image_set_image_from_file(
-								p, img, file)){
-						prozubi_image_remove(p, img);
-					}
+					prozubi_image_set_image_from_file(p, img, file);
+					prozubi_image_free(img);
 				}
 				free(file);
 			}
