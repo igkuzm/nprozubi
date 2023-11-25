@@ -2,15 +2,19 @@
  * File              : helpers.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 30.07.2023
+ * Last Modified Date: 05.11.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
 #ifndef HELPERS_H
 #define HELPERS_H
+#include <bits/types/FILE.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <newt.h>
+#include "config.h"
 
 #define PATIENT(title, i, c)\
 	struct tm *dob = localtime(&c->dateofbirth);\
@@ -78,6 +82,54 @@ newtListboxGetByKey(
 			return i;
 	}
 	return -1;
+}
+
+struct nprozubi_get_value_from_config_data {
+	char *value;
+	const char *key;
+};
+
+static int 
+_nprozubi_get_value_from_config_callback(
+		void *user_data, const char *key, const char *value)
+{
+	struct nprozubi_get_value_from_config_data *d =
+		(struct nprozubi_get_value_from_config_data *)user_data;
+
+	if (strcmp(key, d->key) == 0){
+		strcpy(d->value, value);
+		return 1;
+	}
+
+	return 0;
+}
+
+static char *
+nprozubi_get_value_from_config(
+		const char *key,
+		const char *default_value
+		)
+{
+	char *value = (char *)malloc(CONFIG_ARG_MAX_BYTES);
+	if (!value){
+		perror("malloc");
+		return NULL;
+	}
+	value[0] = 0;
+
+	struct nprozubi_get_value_from_config_data d =
+	{value, key};
+
+	FILE *fp = fopen("nprozubi.conf", "r");
+	if (fp){
+		read_config_file(fp, &d, _nprozubi_get_value_from_config_callback);
+		fclose(fp);
+	}
+
+	if (value[0] == 0)
+		strcpy(value, default_value);
+
+	return value;
 }
 
 #endif /* ifndef HELPERS_H */

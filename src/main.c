@@ -2,7 +2,7 @@
  * File              : main.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 20.07.2023
- * Last Modified Date: 18.08.2023
+ * Last Modified Date: 05.11.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 

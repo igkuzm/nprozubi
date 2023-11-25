@@ -2,7 +2,7 @@
  * File              : caseslist.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 21.08.2023
+ * Last Modified Date: 25.11.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef CASES_LIST_H
@@ -21,7 +21,6 @@
 #include "planlecheniya.h"
 #include "imageslist.h"
 #include "textview.h"
-
 
 struct cases_list_t {
 	prozubi_t *p;
@@ -195,10 +194,10 @@ cases_list_new(
 							newtSuspend();
 							remove(".tmp.txt");
 
-							FILE *fp = fopen(".tmp.txt", "w+");
-							if (!fp) 
+							FILE *fp = fopen(".tmp.txt", "w");
+							if (!fp)
 								break;
-							
+
 							if (n->key == CASEDIAGNOZIS)
 								if (!v || strlen(v) < 2)
 									v = prozubi_diagnosis_get(p, n->c);
@@ -207,24 +206,20 @@ cases_list_new(
 							fclose(fp);
 							
 							system("$EDITOR .tmp.txt");
-							
+
 							fp = fopen(".tmp.txt", "r");
-							if (!fp) 
+							if (!fp)
 								break;
-							fseek(fp, 0, SEEK_END);
-							size_t size = ftell(fp);
-							fseek(fp, 0, SEEK_SET);
-							char *buf = (char *)malloc(size);
-							if (!buf) break;
-							fread(buf, size, 1, fp);
+							
+							int len;
+							char buf[BUFSIZ];
+							if ((len = (fread(buf, 1, BUFSIZ-1, fp))) > 0){
+								buf[len]=0;
+								prozubi_case_set_text(n->key, p, n->c, buf);
+							}
 							fclose(fp);
 							
-							prozubi_case_set_text(n->key, p, n->c, buf);
-
-							free(buf);
-							
 							newtResume();
-
 							cases_list_update(list, &t);
 							newtListboxSetCurrent(list, cur);
 						}
