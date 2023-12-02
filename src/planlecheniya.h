@@ -2,7 +2,7 @@
  * File              : planlecheniya.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 24.07.2023
- * Last Modified Date: 05.11.2023
+ * Last Modified Date: 02.12.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
@@ -21,6 +21,7 @@
 #include "planlecheniyaedit.h"
 #include "dialog.h"
 #include "helpers.h"
+#include "ini.h"
 
 
 struct plt {
@@ -305,34 +306,34 @@ plan_lecheniya_update(
 						buttons, 4);
 				if (sel == 1){
 					newtSuspend();
-					char *command = nprozubi_get_value_from_config(
-							"PRINTCMD", "soffice out.rtf");
-					if (command){
-						system(command);
-						free(command);
-					}
+					char *command = ini_get(
+							"nprozubi.ini", NULL, "PRINTCMD");
+					if (!command)
+						command = strdup("soffice out.rtf");
+					system(command);
+					free(command);
 					//system("unoconv -f pdf out.rtf");
 					//system("lp out.pdf");
 					newtResume();
 				} else if (sel == 2){
 					newtSuspend();
-					char *command = nprozubi_get_value_from_config(
-							"OPENCMD", "soffice out.rtf");
-					if (command){
-						system(command);
-						free(command);
-					}
+					char *command = ini_get(
+							"nprozubi.ini", NULL, "OPENCMD");
+					if (!command)
+						command = strdup("soffice out.rtf");
+					system(command);
+					free(command);
 					//system("unoconv -f pdf out.rtf");
 					//system("fbpdf out.pdf");
 					newtResume();
 				} else if (sel == 3){
 					newtSuspend();
-					char *command = nprozubi_get_value_from_config(
-							"MAILCMD", "mutt -a out.rtf");
-					if (command){
-						system(command);
-						free(command);
-					}
+					char *command = ini_get(
+							"nprozubi.ini", NULL, "MAILCMD");
+					if (!command)
+						command = strdup("mutt -a out.rtf");
+					system(command);
+					free(command);
 					//system("unoconv -f pdf out.rtf");
 					//system("mutt -a out.pdf");
 					newtResume();

@@ -2,7 +2,7 @@
  * File              : main.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 20.07.2023
- * Last Modified Date: 05.11.2023
+ * Last Modified Date: 02.12.2023
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
@@ -28,6 +28,7 @@
 #include "priceedit.h"
 #include "nomenklatura.h"
 #include "error.h"
+#include "ini.h"
 
 struct nomenklatura_add_t {
 	prozubi_t *p;
@@ -83,13 +84,8 @@ on_destroy(
 int main(int argc, char *argv[])
 {
 	// try to load token
-	char token[256] = {0};
-	FILE *fp = fopen("token", "r");
-	if (fp) {
-		fread(token, 255, 1, fp);
-		fclose(fp);
-		token[255] = 0;
-	}
+	char *token = ini_get(
+		"nprozubi.ini", NULL, "TOKEN");
 
 	SWITCH selected = SW_PATIENTS;
 	int i, cols, rows, key, appclose = 0;
