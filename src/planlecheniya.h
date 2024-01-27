@@ -2,7 +2,7 @@
  * File              : planlecheniya.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 24.07.2023
- * Last Modified Date: 02.12.2023
+ * Last Modified Date: 28.01.2024
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
@@ -304,7 +304,9 @@ plan_lecheniya_update(
 						"Печать плана", 
 						"Распечатать план лечения или открыть для просмотра?", 
 						buttons, 4);
-				if (sel == 1){
+				if (sel == 0){
+					break;
+				}else if (sel == 1){
 					newtSuspend();
 					char *command = ini_get(
 							"nprozubi.ini", NULL, "PRINTCMD");
