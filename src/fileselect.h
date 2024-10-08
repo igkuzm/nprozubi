@@ -16,18 +16,18 @@
 #include <newt.h>
 #include <dirent.h>
 #include "helpers.h"
-#include "fm.h"
+#include <unistd.h>
 
 static char * staticpath = NULL;
 
 //char *getcwd(char *buffer, int maxlen);
 
-//static const char * fext(const char *filename) {
-		//const char *dot = strrchr(filename, '.');
-		//if (!dot || dot == filename)
-			//return "";
-		//return dot + 1;
-//}
+static const char * file_select_fext(const char *filename) {
+		const char *dot = strrchr(filename, '.');
+		if (!dot || dot == filename)
+			return "";
+		return dot + 1;
+}
 
 static int lastpath(const char *filename) {
 		const char *slash = strrchr(filename, '/');
@@ -71,7 +71,7 @@ file_select_filter(const struct dirent *d){
 	}
 	if (d->d_type == DT_REG || d->d_type == DT_LNK){
 		// allow only *.png, *.tiff, *jpeg
-		const char *ext = fext(d->d_name);
+		const char *ext = file_select_fext(d->d_name);
 		if (strcmp(ext, "png") == 0) return 1;
 		if (strcmp(ext, "PNG") == 0) return 1;
 		if (strcmp(ext, "jpg") == 0) return 1;
