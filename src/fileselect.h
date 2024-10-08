@@ -2,7 +2,7 @@
  * File              : fileselect.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 21.08.2023
+ * Last Modified Date: 08.10.2024
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef FILE_SELECT_H
@@ -16,17 +16,18 @@
 #include <newt.h>
 #include <dirent.h>
 #include "helpers.h"
+#include "fm.h"
 
 static char * staticpath = NULL;
 
-char *getcwd(char *buffer, int maxlen);
+//char *getcwd(char *buffer, int maxlen);
 
-static const char * fext(const char *filename) {
-		const char *dot = strrchr(filename, '.');
-		if (!dot || dot == filename)
-			return "";
-		return dot + 1;
-}
+//static const char * fext(const char *filename) {
+		//const char *dot = strrchr(filename, '.');
+		//if (!dot || dot == filename)
+			//return "";
+		//return dot + 1;
+//}
 
 static int lastpath(const char *filename) {
 		const char *slash = strrchr(filename, '/');

@@ -30,6 +30,8 @@
 #include "nomenklatura.h"
 #include "error.h"
 #include "ini.h"
+#include "getbundle.h"
+#include "fm.h"
 
 struct nomenklatura_add_t {
 	prozubi_t *p;
@@ -84,6 +86,20 @@ on_destroy(
 
 int main(int argc, char *argv[])
 {
+	/*
+	///get bundle directory
+	char *bundle = getbundle(argv);
+	if (!bundle){
+		fprintf(stderr, "can't get application bundle\n");
+		return 1;
+	}
+	//copy file to current directory
+	if (!dcopyf(bundle, ".", false, 
+			"*.sqlite, *.ttf, *.png, pixmaps/*, Templates/*"))
+		fprintf(stderr, "copy files from bundle: done!\n");
+	*/
+
+
 	// try to load token
 	char *token = ini_get(
 		"nprozubi.ini", NULL, "TOKEN");
