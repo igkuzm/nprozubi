@@ -2,7 +2,7 @@
  * File              : combobox.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 23.07.2023
- * Last Modified Date: 29.07.2023
+ * Last Modified Date: 08.10.2024
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef COMBOBOX_H
@@ -34,7 +34,7 @@ combobox_new(
 	newtFormAddHotKey(form, 'q');
 
 	// create radio buttons
-	char *value = (char *)prozubi_case_get(n->c, n->key); 
+	char *value = (char *)prozubi_case_get_for_key(n->c, n->key); 
 	if (!value) value = "";
 	i = 0;
 	newtComponent b = NULL;

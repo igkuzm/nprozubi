@@ -2,7 +2,7 @@
  * File              : caseslist.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 25.11.2023
+ * Last Modified Date: 08.10.2024
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef CASES_LIST_H
@@ -182,7 +182,7 @@ cases_list_new(
 					{
 						int edit = 0;
 						int cur = newtListboxGetByKey(list, n);
-						char *v = (char *)prozubi_case_get(n->c, n->key);
+						char *v = (char *)prozubi_case_get_for_key(n->c, n->key);
 						if (key == 'e' || (edit = textview(n->title, v))){
 							if (edit == -1){
 								//remove
@@ -235,7 +235,7 @@ cases_list_new(
 					}
 				case CASES_LIST_TYPE_DATE:
 					{
-						time_t *value = (time_t *)prozubi_case_get(n->c, n->key);
+						time_t *value = (time_t *)prozubi_case_get_for_key(n->c, n->key);
 						time_t  nvalue = calendar_new(*value);
 						if (nvalue != *value){
 							int cur = newtListboxGetByKey(list, n);

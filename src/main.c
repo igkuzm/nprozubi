@@ -2,7 +2,7 @@
  * File              : main.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 20.07.2023
- * Last Modified Date: 02.12.2023
+ * Last Modified Date: 08.10.2024
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 
@@ -149,7 +149,8 @@ int main(int argc, char *argv[])
 						// add new patinet
 						struct passport_t *c = 
 							prozubi_passport_new(
-								p, 
+								p,
+							  "",	
 								"Новый", 
 								"пациент", 
 								"", 
