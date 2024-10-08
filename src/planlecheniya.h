@@ -289,13 +289,11 @@ plan_lecheniya_update(
 			}
 		}
 		if (key == NEWT_KEY_F1 || key == 'p'){
-			struct planlecheniya_t *t = 
-					(struct planlecheniya_t *)newtCheckboxTreeGetCurrent(tree);
-			if (!t)
-				break;
 			const char *rtf = documents_get_plan_lecheniya(
 					"Templates/planLecheniyaTemplate.rtf", 
 					p, patient, c);
+			if (!rtf)
+				break;
 
 			int sel = -1;
 			while (sel != 0 && sel != 1){
