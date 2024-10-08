@@ -2,7 +2,7 @@
  * File              : dialog.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.07.2023
- * Last Modified Date: 21.08.2023
+ * Last Modified Date: 08.10.2024
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef DIALOG_H
@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
-
-int wcwidth(wchar_t c);
 
 static int
 dialog(
@@ -30,10 +28,9 @@ dialog(
 		int len = 0;
 		char *p = (char *)buttons[i];
 		wchar_t c;
-		mbstate_t ps;
 		while(*p){
-			int ret = mbrtowc(&c, p, MB_CUR_MAX, &ps);
-			//len += wcwidth(c);
+			int ret = 
+				mbrtowc(&c, p, MB_CUR_MAX, NULL);
 			len ++;
 			p += ret;
 		}
@@ -41,6 +38,7 @@ dialog(
 		cols += len;
 	}
 	cols += 3 * count;
+	cols = 10*count;
 
 	newtComponent form, text;
 	newtComponent array[count];

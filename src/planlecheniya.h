@@ -296,49 +296,60 @@ plan_lecheniya_update(
 				break;
 
 			int sel = -1;
-			while (sel != 0 && sel != 1){
-				const char *buttons[] = {"отмена", "печать", "просмотр", "email"};
+			const char *buttons[] = 
+			{"отмена", "печать", "просмотр", "email"};
+			//while (sel != 0 && sel != 1){
 				sel = dialog(
 						"Печать плана", 
 						"Распечатать план лечения или открыть для просмотра?", 
 						buttons, 4);
-				if (sel == 0){
-					break;
-				}else if (sel == 1){
-					newtSuspend();
-					char *command = ini_get(
-							"nprozubi.ini", NULL, "PRINTCMD");
-					if (!command)
-						command = strdup("soffice out.rtf");
-					system(command);
-					free(command);
-					//system("unoconv -f pdf out.rtf");
-					//system("lp out.pdf");
-					newtResume();
-				} else if (sel == 2){
-					newtSuspend();
-					char *command = ini_get(
-							"nprozubi.ini", NULL, "OPENCMD");
-					if (!command)
-						command = strdup("soffice out.rtf");
-					system(command);
-					free(command);
-					//system("unoconv -f pdf out.rtf");
-					//system("fbpdf out.pdf");
-					newtResume();
-				} else if (sel == 3){
-					newtSuspend();
-					char *command = ini_get(
-							"nprozubi.ini", NULL, "MAILCMD");
-					if (!command)
-						command = strdup("mutt -a out.rtf");
-					system(command);
-					free(command);
-					//system("unoconv -f pdf out.rtf");
-					//system("mutt -a out.pdf");
-					newtResume();
+				switch (sel) {
+					case 1:
+					{
+						newtSuspend();
+						char *command = ini_get(
+								"nprozubi.ini", NULL, "PRINTCMD");
+						if (!command)
+							command = strdup("soffice out.rtf");
+						system(command);
+						free(command);
+						//system("unoconv -f pdf out.rtf");
+						//system("lp out.pdf");
+						newtResume();
+						break;
+					}
+					case 2:
+					{
+						newtSuspend();
+						char *command = ini_get(
+								"nprozubi.ini", NULL, "OPENCMD");
+						if (!command)
+							command = strdup("soffice out.rtf");
+						system(command);
+						free(command);
+						//system("unoconv -f pdf out.rtf");
+						//system("fbpdf out.pdf");
+						newtResume();
+						break;
+					} 
+					case 3:
+					{
+						newtSuspend();
+						char *command = ini_get(
+								"nprozubi.ini", NULL, "MAILCMD");
+						if (!command)
+							command = strdup("mutt -a out.rtf");
+						system(command);
+						free(command);
+						//system("unoconv -f pdf out.rtf");
+						//system("mutt -a out.pdf");
+						newtResume();
+						break;
+					}
+
+					default: break;
 				}
-			}
+			//}
 			break;
 		}
 		if (key == NEWT_KEY_ESCAPE || key == NEWT_KEY_F10 || key == 'q'){

@@ -15,6 +15,7 @@
 
 #include "askstring.h"
 #include "caseslist.h"
+#include "dialog.h"
 #include "main.h"
 #include "keybar.h"
 #include "patientedit.h"
